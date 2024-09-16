@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -319,55 +318,6 @@ document.addEventListener("keydown", function(event) {
                 resultElement.innerHTML = '<p>Nenhum resultado encontrado.</p>';
             }
         }
-function getUrlParams() {
-        const params = new URLSearchParams(window.location.search);
-        return {
-            tema: params.get('tema'),
-            length: params.get('q'),
-            hint: params.get('l')
-        };
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const params = getUrlParams();
-        let temaUrl = '';
-        let title = '';
-
-        switch (params.tema) {
-            case 'geral':
-                temaUrl = 'https://raw.githubusercontent.com/kelbovine/replygtc/main/geral.json';
-                title = 'Geral';
-                break;
-            case 'objetos':
-                temaUrl = 'https://raw.githubusercontent.com/kelbovine/replygtc/main/objetos.json';
-                title = 'Objetos';
-                break;
-            case 'alimentos':
-                temaUrl = 'https://raw.githubusercontent.com/kelbovine/replygtc/main/alimentos.json';
-                title = 'Alimentos';
-                break;
-            case 'animais':
-                temaUrl = 'https://raw.githubusercontent.com/kelbovine/replygtc/main/animais.json';
-                title = 'Animais';
-                break;
-            case 'verbos':
-                temaUrl = 'https://raw.githubusercontent.com/kelbovine/replygtc/main/verbos.json';
-                title = 'Verbos';
-                break;
-            case 'desenhos':
-                temaUrl = 'https://raw.githubusercontent.com/kelbovine/replygtc/main/desenhos.json';
-                title = 'Desenhos Animados';
-                break;
-            case 'profissoes':
-                temaUrl = 'https://raw.githubusercontent.com/kelbovine/replygtc/main/profissoes.json';
-                title = 'Profissões';
-                break;
-        }
-
-        if (temaUrl) {
-            carregarDados(temaUrl, title, params.length, params.hint ? params.hint.toUpperCase() : '');
-        }
-    });
-</script>
+    </script>
 </body>
 </html>
