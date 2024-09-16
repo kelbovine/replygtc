@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Respostas do Gartic 🏠 ⚾ 🍓 🐼 🗨️ 🎩 🧳</title>
+    <title>Lista de Respostas do Gartic</title>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -21,6 +21,14 @@
 
         h2 {
             color: #ff6f91;
+            font-weight: bold;
+        }
+
+        h3 {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            color: #ff007f;
+            margin-top: 20px; 
         }
 
         .search-container, input[type="number"], input[type="text"], button {
@@ -72,25 +80,6 @@
             cursor: pointer;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        table, th, td {
-            border: 1px solid #ffffff;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #ff007f;
-        }
-
         .hidden {
             display: none;
         }
@@ -102,17 +91,6 @@
             margin-right: 5px;
         }
 
-        /* Responsividade */
-        @media screen and (max-width: 768px) {
-            body {
-                margin: 10px;
-            }
-            h1 {
-                font-size: 1.5em;
-            }
-        }
-
-        /* Avisos abaixo dos inputs */
         .warning {
             color: red;
             font-size: 0.9em;
@@ -129,7 +107,59 @@
             color: #ff6f91;
         }
 
-        /* Estilo para a lista de palavras do tema */
+        .tema-lista {
+            margin-top: 20px;
+            background-color: #3c0048;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .result-container {
+            margin-top: 20px;
+            background-color: #3c0048;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .result-container p {
+            font-weight: bold;
+        }
+                 .credits {
+            font-size: 14px;
+            color: #fff;
+            background-color: #800080;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+        }
+       @media screen and (max-width: 768px) {
+            body {
+                margin: 10px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+
+        .warning {
+            color: red;
+            font-size: 0.9em;
+        }
+
+        .example {
+            color: red;
+            font-size: 0.9em;
+        }
+
+        .result-count {
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #ff6f91;
+        }
+
         .tema-lista {
             margin-top: 20px;
             background-color: #3c0048;
@@ -172,10 +202,10 @@
         <input type="number" id="lengthInput" placeholder="Quantidade de letras" min="1">
         <div class="example">Exemplo: 10</div>
 
-        <input type="text" id="hintInput" placeholder="Dica inicial">
+        <input type="text" id="hintInput" placeholder="Letra inicial">
         <div class="example">Exemplo: Letra P</div>
 
-        <input type="text" id="lettersInput" placeholder="Letras da palavra (separadas por espaço)">
+        <input type="text" id="lettersInput" placeholder="Letras da palavra">
         <div class="warning">Separe as letras com espaços.</div>
 
         <button onclick="search()">Buscar</button>
@@ -190,7 +220,6 @@
     <script>
         let dadosTemas = {};
 
-        // Código para select personalizado
         const customSelect = document.querySelector('.custom-select');
         const selected = customSelect.querySelector('.select-selected');
         const itemsContainer = customSelect.querySelector('.select-items');
@@ -203,15 +232,17 @@
             item.addEventListener('click', function() {
                 selected.innerHTML = this.innerHTML;
                 selected.setAttribute('data-value', this.getAttribute('data-value'));
-                carregarDados(this.getAttribute('data-value'), this.getAttribute('data-title'), this.getAttribute('data-img'));
+                carregarDados(this.getAttribute('data-value'), this.getAttribute('data-title'));
                 itemsContainer.classList.add('hidden');
             });
         });
 
-        function carregarDados(temaUrl, title, imgSrc) {
+        function carregarDados(temaUrl, title) {
             if (temaUrl) {
-                // Atualiza o cabeçalho com o tema e a imagem correta e exibe os campos de busca
-                document.getElementById('temaHeader').innerHTML = `<img src="${imgSrc}" alt="${title}" class="emoji"> Lista de ${title}`;
+                document.getElementById('result').innerHTML = '';
+                document.getElementById('listaTemas').classList.add('hidden');
+                document.getElementById('listaTemas').innerHTML = '';
+
                 document.getElementById('temaHeader').classList.remove('hidden');
                 document.getElementById('searchContainer').classList.remove('hidden');
 
@@ -219,22 +250,30 @@
                     .then(response => response.json())
                     .then(data => {
                         dadosTemas = data;
-                        displayTemas();
+                        const totalWords = Object.values(dadosTemas).flat().length;
+                        document.getElementById('temaHeader').innerHTML = `${title} (${totalWords} palavras no total)`;
+
+                        displayWordsByLength();
                     })
-                    .catch(error => console.error('Erro ao carregar os dados:', error));
+                    .catch(error => console.error('Erro ao carregar dados:', error));
             }
         }
 
-        function displayTemas() {
+        function displayWordsByLength() {
             const listElement = document.getElementById('listaTemas');
-            const wordCounts = Object.entries(dadosTemas).map(([length, words]) => {
-                return `<h3>${length} Letras</h3><ul>${words.map(word => `<li>${word}</li>`).join('')}</ul>`;
-            }).join('');
+            let wordCounts = '';
+
+            for (const category in dadosTemas) {
+                wordCounts += `<h3>${category} letras</h3>` + dadosTemas[category].map(word => `<p>${word}</p>`).join('');
+            }
+
             listElement.innerHTML = wordCounts;
             listElement.classList.remove('hidden');
         }
 
         function search() {
+            document.getElementById('temaHeader').classList.add('hidden'); 
+
             const length = document.getElementById('lengthInput').value;
             const hint = document.getElementById('hintInput').value.toUpperCase();
             const letters = document.getElementById('lettersInput').value.toUpperCase().split(/\s+/);
@@ -247,30 +286,33 @@
                 return matchesLength && matchesHint && matchesLetters;
             });
 
-            displayResults(filteredWords);
+            displayResults(filteredWords, length);
         }
 
-        function displayResults(words) {
+        function displayResults(words, length) {
             const resultElement = document.getElementById('result');
             const listElement = document.getElementById('listaTemas');
-            const resultCount = words.length;
-
-            // Oculta a lista de palavras do tema enquanto os resultados estão ativos
             listElement.classList.add('hidden');
+
+            resultElement.innerHTML = ''; 
 
             const resultCountElement = document.createElement('div');
             resultCountElement.className = 'result-count';
-            resultCountElement.innerText = `${resultCount} resultado(s) encontrado(s)`;
-            resultElement.innerHTML = ''; // Limpa resultados anteriores
+            resultCountElement.innerText = `${words.length} resultados encontrados${length ? ` (${length} letras na busca)` : ''}`;
             resultElement.appendChild(resultCountElement);
 
             if (words.length > 0) {
-                const tableContent = words.map(word => `<tr><td>${word}</td><td>${word.length} letras</td></tr>`).join('');
-                resultElement.innerHTML += `<table><thead><tr><th>Palavra</th><th>Quantidade de Letras</th></tr></thead><tbody>${tableContent}</tbody></table>`;
+                const resultContainer = document.createElement('div');
+                resultContainer.className = 'result-container';
+                resultContainer.innerHTML = words.map(word => `<p><b>${word}</b></p>`).join('');
+                resultElement.appendChild(resultContainer);
             } else {
                 resultElement.innerHTML = '<p>Nenhum resultado encontrado.</p>';
             }
         }
     </script>
+    <div class="credits">
+        Criado para jogadores mobile, desenvolvido por Intocado.
+            </div>
 </body>
 </html>
